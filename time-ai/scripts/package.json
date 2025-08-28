@@ -1,0 +1,16 @@
+{
+  "name": "time-ai-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for Time.AI database initialization and updates",
+  "main": "index.js",
+  "scripts": {
+    "init:plans": "node initPlanConfigs.js",
+    "init:subscriptions": "node initSubscriptionPlans.js",
+    "init:all": "npm run init:plans && npm run init:subscriptions",
+    "update:users": "node updateFirestoreAndPRD.js"
+  },
+  "dependencies": {
+    "firebase": "^9.0.0",
+    "dotenv": "^16.0.0"
+  }
+}

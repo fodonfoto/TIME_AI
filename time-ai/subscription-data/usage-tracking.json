@@ -1,0 +1,18 @@
+{
+  "usage_001": {
+    "userId": "user@example.com",
+    "date": "2025-08-11",
+    "requestCount": 2,
+    "planType": "free",
+    "createdAt": "2025-08-11T15:36:40.225Z",
+    "updatedAt": "2025-08-11T15:36:40.225Z"
+  },
+  "usage_002": {
+    "userId": "pro@example.com",
+    "date": "2025-08-11",
+    "requestCount": 15,
+    "planType": "pro",
+    "createdAt": "2025-08-11T15:36:40.225Z",
+    "updatedAt": "2025-08-11T15:36:40.225Z"
+  }
+}

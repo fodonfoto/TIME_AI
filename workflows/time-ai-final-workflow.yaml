@@ -1,0 +1,225 @@
+name: time-ai-chat-workflow
+description: Time AI Chat System with Firebase Integration
+
+blocks:
+  webhook_start:
+    type: generic_webhook
+    name: "Webhook Start"
+    connections:
+      success: firebase_auth
+
+  firebase_auth:
+    type: function
+    name: "Firebase Authentication"
+    inputs:
+      code: |
+        const admin = require('firebase-admin');
+        try {
+          const token = inputs.firebaseToken;
+          const decodedToken = await admin.auth().verifyIdToken(token);
+          return {
+            success: true,
+            userId: decodedToken.uid,
+            email: decodedToken.email
+          };
+        } catch (error) {
+          return { success: false, error: error.message };
+        }
+    connections:
+      success: get_subscription
+      error: auth_failed
+
+  auth_failed:
+    type: response
+    name: "Auth Failed Response"
+    inputs:
+      status: 401
+      body:
+        message: "Authentication failed"
+        error: "invalid_token"
+
+  get_subscription:
+    type: api
+    name: "Get User Subscription"
+    inputs:
+      url: "https://firestore.googleapis.com/v1/projects/ready-ai-niwat/databases/(default)/documents/user_subscriptions/{{firebase_auth.userId}}"
+      method: GET
+      headers:
+        Authorization: "Bearer {{inputs.firebaseToken}}"
+    connections:
+      success: check_usage_limit
+      error: create_default_subscription
+
+  create_default_subscription:
+    type: api
+    name: "Create Default Subscription"
+    inputs:
+      url: "https://firestore.googleapis.com/v1/projects/ready-ai-niwat/databases/(default)/documents/user_subscriptions/{{firebase_auth.userId}}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {{inputs.firebaseToken}}"
+        Content-Type: "application/json"
+      body:
+        fields:
+          planType: { stringValue: "free" }
+          status: { stringValue: "active" }
+          dailyLimit: { integerValue: "5" }
+          createdAt: { timestampValue: "{{now}}" }
+    connections:
+      success: check_usage_limit
+
+  check_usage_limit:
+    type: function
+    name: "Check Usage Limit"
+    inputs:
+      code: |
+        const today = new Date().toISOString().split('T')[0];
+        const subscription = inputs.subscription || { dailyLimit: 5 };
+        const currentUsage = inputs.currentUsage || 0;
+        
+        return {
+          canUse: currentUsage < subscription.dailyLimit,
+          remaining: subscription.dailyLimit - currentUsage,
+          currentUsage: currentUsage,
+          dailyLimit: subscription.dailyLimit
+        };
+    connections:
+      success: usage_gate
+
+  usage_gate:
+    type: condition
+    name: "Usage Gate"
+    inputs:
+      conditions:
+        - condition: "{{check_usage_limit.canUse}} === true"
+          label: "can_use"
+        - condition: "{{check_usage_limit.canUse}} === false"
+          label: "limit_exceeded"
+    connections:
+      can_use: classify_question
+      limit_exceeded: usage_exceeded
+
+  usage_exceeded:
+    type: response
+    name: "Usage Exceeded Response"
+    inputs:
+      status: 429
+      body:
+        message: "คุณได้ใช้งานครบตามขีดจำกัดรายวันแล้ว กรุณาอัพเกรดแพ็กเกจหรือรอจนถึงวันถัดไป"
+        error: "usage_limit_exceeded"
+        remaining: 0
+
+  classify_question:
+    type: agent
+    name: "Question Classifier"
+    inputs:
+      model: "gpt-4o"
+      temperature: 0.1
+      apiKey: "{{OPENAI_API_KEY}}"
+      systemPrompt: "Classify this question into exactly one category: 'general', 'research', or 'coding'. Return only the category name."
+      userPrompt: "{{inputs.userMessage}}"
+    connections:
+      success: route_to_agent
+
+  route_to_agent:
+    type: router
+    name: "Route Agent"
+    inputs:
+      prompt: "Route based on classification: {{classify_question.content}}"
+      model: "gpt-4o"
+      apiKey: "{{OPENAI_API_KEY}}"
+    connections:
+      general: general_agent
+      research: research_agent
+      coding: coding_agent
+      default: general_agent
+
+  general_agent:
+    type: agent
+    name: "General Agent"
+    inputs:
+      model: "gpt-4o"
+      temperature: 0.7
+      apiKey: "{{OPENAI_API_KEY}}"
+      systemPrompt: "You are a helpful AI assistant. Provide clear, concise answers in Thai."
+      userPrompt: "{{inputs.userMessage}}"
+    connections:
+      success: increment_usage
+
+  research_agent:
+    type: agent
+    name: "Research Agent"
+    inputs:
+      model: "gpt-4o"
+      temperature: 0.3
+      apiKey: "{{OPENAI_API_KEY}}"
+      systemPrompt: "You are a research specialist. Provide detailed, well-researched answers with sources in Thai."
+      userPrompt: "{{inputs.userMessage}}"
+    connections:
+      success: increment_usage
+
+  coding_agent:
+    type: agent
+    name: "Coding Agent"
+    inputs:
+      model: "gpt-4o"
+      temperature: 0.2
+      apiKey: "{{OPENAI_API_KEY}}"
+      systemPrompt: "You are a coding expert. Provide code solutions and explanations in Thai."
+      userPrompt: "{{inputs.userMessage}}"
+    connections:
+      success: increment_usage
+
+  increment_usage:
+    type: api
+    name: "Increment Usage"
+    inputs:
+      url: "https://firestore.googleapis.com/v1/projects/ready-ai-niwat/databases/(default)/documents/usage_tracking/{{firebase_auth.userId}}_{{today}}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {{inputs.firebaseToken}}"
+        Content-Type: "application/json"
+      body:
+        fields:
+          requestCount:
+            integerValue: "{{check_usage_limit.currentUsage + 1}}"
+          updatedAt:
+            timestampValue: "{{now}}"
+    connections:
+      success: save_chat
+
+  save_chat:
+    type: api
+    name: "Save Chat History"
+    inputs:
+      url: "https://firestore.googleapis.com/v1/projects/ready-ai-niwat/databases/(default)/documents/chat_history"
+      method: POST
+      headers:
+        Authorization: "Bearer {{inputs.firebaseToken}}"
+        Content-Type: "application/json"
+      body:
+        fields:
+          userId:
+            stringValue: "{{firebase_auth.userId}}"
+          title:
+            stringValue: "{{inputs.userMessage | truncate(30)}}"
+          timestamp:
+            timestampValue: "{{now}}"
+    connections:
+      success: final_response
+
+  final_response:
+    type: response
+    name: "Final Response"
+    inputs:
+      status: 200
+      body:
+        content: "{{aiResponse.content}}"
+        usage:
+          current: "{{check_usage_limit.currentUsage + 1}}"
+          limit: "{{check_usage_limit.dailyLimit}}"
+          remaining: "{{check_usage_limit.dailyLimit - check_usage_limit.currentUsage - 1}}"
+
+environment:
+  FIREBASE_PROJECT_ID: ready-ai-niwat
+  OPENAI_API_KEY: your-openai-key

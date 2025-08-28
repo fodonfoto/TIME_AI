@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none" />
+    <title>Time AI Hub</title>
+    <!-- Puter.js script with error handling and auth prevention -->
+    <script>
+      // Disable Puter auto-authentication to prevent 401 errors
+      window.puterConfig = {
+        autoAuth: false,
+        silent: true
+      };
+      
+      // Load Puter.js with error handling
+      (function() {
+        const script = document.createElement('script');
+        script.src = 'https://js.puter.com/v2/';
+        script.onload = function() {
+          console.log('✅ Puter.js loaded successfully (auth disabled)');
+          // Override whoami to prevent auto-auth calls
+          if (window.puter && window.puter.auth) {
+            const originalWhoami = window.puter.auth.whoami;
+            window.puter.auth.whoami = function() {
+              return Promise.resolve(null);
+            };
+          }
+        };
+        script.onerror = function() {
+          console.warn('⚠️ Puter.js failed to load - continuing without Puter services');
+          // Create a mock puter object to prevent errors
+          window.puter = {
+            ai: {
+              chat: function() {
+                return Promise.reject(new Error('Puter.js not available'));
+              }
+            },
+            auth: {
+              whoami: function() {
+                return Promise.resolve(null);
+              }
+            }
+          };
+        };
+        document.head.appendChild(script);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

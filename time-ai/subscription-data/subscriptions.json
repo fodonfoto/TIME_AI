@@ -1,0 +1,20 @@
+{
+  "sub_001": {
+    "userId": "user@example.com",
+    "planType": "free",
+    "startDate": "2025-08-11T15:36:40.224Z",
+    "endDate": null,
+    "status": "active",
+    "createdAt": "2025-08-11T15:36:40.224Z",
+    "updatedAt": "2025-08-11T15:36:40.224Z"
+  },
+  "sub_002": {
+    "userId": "pro@example.com",
+    "planType": "pro",
+    "startDate": "2025-08-11T15:36:40.224Z",
+    "endDate": null,
+    "status": "active",
+    "createdAt": "2025-08-11T15:36:40.224Z",
+    "updatedAt": "2025-08-11T15:36:40.224Z"
+  }
+}

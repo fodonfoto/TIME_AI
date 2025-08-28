@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection - allow user access and admin read access
+    match /users/{userId} {
+      // Users can read/write their own data
+      allow write: if request.auth != null && request.auth.uid == userId;
+      // Admins can read any user document for sync purposes
+      allow read: if request.auth != null && (request.auth.uid == userId || request.auth.token.admin == true);
+
+      // User subcollections (conversations, etc.)
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Subscription Plans - publicly readable, admin only write
+    match /subscription_plans/{planId} {
+      allow read: if true; // Publicly accessible
+      allow write: if false; // Admin only
+    }
+
+    // Conversations - users can only access their own conversations
+    match /conversations/{conversationId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+    }
+
+    // User originals - users can create their own record during registration
+    // Uses auto-generated document IDs with userId as field
+    match /user_originals/{docId} {
+      // Allow read access for authenticated users to check if record exists
+      allow read: if request.auth != null && 
+        (resource == null || request.auth.uid == resource.data.userId);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow write: if false; // Immutable after creation for anti-abuse protection
+    }
+
+    // Usage tracking - users can read/write their own tracking data
+    match /usage_tracking/{trackingId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || request.auth.uid == resource.data.userId);
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // Usage analytics - users can create their initial analytics, but not modify
+    match /usage_analytics/{analyticsId} {
+      allow read: if request.auth != null && 
+        (resource == null || request.auth.uid == resource.data.userId);
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+      allow write: if false; // System only for updates
+    }
+
+    // Billing transactions - users can only access their own transactions
+    match /billing_transactions/{transactionId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || request.auth.uid == resource.data.userId);
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // Admin functions (catch-all for admin access)
+    match /{document=**} {
+      allow read, write: if request.auth != null && 
+        request.auth.token.admin == true;
+    }
+  }
+}

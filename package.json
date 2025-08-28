@@ -1,0 +1,38 @@
+{
+  "name": "time-ai-testing-suite",
+  "version": "1.0.0",
+  "description": "Testing suite for Time AI Login System",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install && cd time-ai && npm install && cd ../time-ai/scripts && npm install && cd ../functions && npm install",
+    "test:playwright": "npx playwright test",
+    "test:playwright:headed": "npx playwright test --headed",
+    "test:playwright:debug": "npx playwright test --debug",
+    "test:app": "cd time-ai && npm test",
+    "test:app:watch": "cd time-ai && npm run test:watch",
+    "test:app:coverage": "cd time-ai && npm run test:coverage",
+    "dev": "cd time-ai && npm run dev",
+    "build": "cd time-ai && npm run build",
+    "lint": "cd time-ai && npm run lint",
+    "lint:fix": "cd time-ai && npm run lint:fix"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "puppeteer": "^21.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fodonfoto/TIME_AI.git"
+  },
+  "author": "Time AI Team",
+  "license": "MIT",
+  "keywords": [
+    "testing",
+    "playwright",
+    "automation",
+    "login-system",
+    "otp-verification",
+    "firebase",
+    "react"
+  ]
+}

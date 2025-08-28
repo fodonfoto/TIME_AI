@@ -1,0 +1,26 @@
+{
+  "name": "firebase-mcp-server",
+  "version": "1.0.0",
+  "description": "Custom Firebase MCP Server for Time AI project",
+  "main": "firebase-mcp-server.js",
+  "type": "module",
+  "bin": {
+    "firebase-mcp-server": "./firebase-mcp-server.js"
+  },
+  "scripts": {
+    "start": "node firebase-mcp-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "firebase-admin": "^12.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "firebase",
+    "firestore",
+    "model-context-protocol"
+  ],
+  "author": "Time AI Team",
+  "license": "MIT"
+}

@@ -1,0 +1,92 @@
+{
+  "__collections__": {
+    "plan_configs": {
+      "free": {
+        "id": "free",
+        "name": "Free Plan",
+        "dailyLimit": 10,
+        "price": 0,
+        "features": [
+          "Basic AI Agent Chat",
+          "File Analysis",
+          "Generate Image",
+          "Generate AI"
+        ],
+        "active": true,
+        "createdAt": "2025-08-16T17:33:47.674Z",
+        "updatedAt": "2025-08-16T17:33:47.675Z"
+      },
+      "pro": {
+        "id": "pro",
+        "name": "Pro Plan",
+        "dailyLimit": 100,
+        "price": 10,
+        "features": [
+          "Advance AI Agent Chat",
+          "File Analysis",
+          "Generate Image",
+          "Generate AI",
+          "Connect Tools"
+        ],
+        "active": true,
+        "createdAt": "2025-08-16T17:33:47.675Z",
+        "updatedAt": "2025-08-16T17:33:47.675Z"
+      },
+      "max": {
+        "id": "max",
+        "name": "Max Plan",
+        "dailyLimit": -1,
+        "price": 18,
+        "features": [
+          "Advance AI Agent Chat",
+          "File Analysis",
+          "Generate Image",
+          "Generate AI",
+          "Connect Tools",
+          "Priority Support"
+        ],
+        "active": true,
+        "createdAt": "2025-08-16T17:33:47.675Z",
+        "updatedAt": "2025-08-16T17:33:47.675Z"
+      }
+    },
+    "subscriptions": {
+      "sub_001": {
+        "userId": "user@example.com",
+        "planType": "free",
+        "startDate": "2025-08-11T15:36:40.225Z",
+        "endDate": null,
+        "status": "active",
+        "createdAt": "2025-08-11T15:36:40.225Z",
+        "updatedAt": "2025-08-11T15:36:40.225Z"
+      },
+      "sub_002": {
+        "userId": "pro@example.com",
+        "planType": "pro",
+        "startDate": "2025-08-11T15:36:40.225Z",
+        "endDate": null,
+        "status": "active",
+        "createdAt": "2025-08-11T15:36:40.225Z",
+        "updatedAt": "2025-08-11T15:36:40.225Z"
+      }
+    },
+    "usage_tracking": {
+      "usage_001": {
+        "userId": "user@example.com",
+        "date": "2025-08-11",
+        "requestCount": 2,
+        "planType": "free",
+        "createdAt": "2025-08-11T15:36:40.225Z",
+        "updatedAt": "2025-08-11T15:36:40.225Z"
+      },
+      "usage_002": {
+        "userId": "pro@example.com",
+        "date": "2025-08-11",
+        "requestCount": 15,
+        "planType": "pro",
+        "createdAt": "2025-08-11T15:36:40.225Z",
+        "updatedAt": "2025-08-11T15:36:40.225Z"
+      }
+    }
+  }
+}

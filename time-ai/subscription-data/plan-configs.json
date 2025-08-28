@@ -1,0 +1,50 @@
+{
+  "free": {
+    "id": "free",
+    "name": "Free Plan",
+    "dailyLimit": 10,
+    "price": 0,
+    "features": [
+      "Basic AI Agent Chat",
+      "File Analysis",
+      "Generate Image",
+      "Generate AI"
+    ],
+    "active": true,
+    "createdAt": "2025-08-11T15:36:40.223Z",
+    "updatedAt": "2025-08-11T15:36:40.224Z"
+  },
+  "pro": {
+    "id": "pro",
+    "name": "Pro Plan",
+    "dailyLimit": 100,
+    "price": 10,
+    "features": [
+      "Advance AI Agent Chat",
+      "File Analysis",
+      "Generate Image",
+      "Generate AI",
+      "Connect Tools"
+    ],
+    "active": true,
+    "createdAt": "2025-08-11T15:36:40.224Z",
+    "updatedAt": "2025-08-11T15:36:40.224Z"
+  },
+  "max": {
+    "id": "max",
+    "name": "Max Plan",
+    "dailyLimit": -1,
+    "price": 18,
+    "features": [
+      "Advance AI Agent Chat",
+      "File Analysis",
+      "Generate Image",
+      "Generate AI",
+      "Connect Tools",
+      "Priority Support"
+    ],
+    "active": true,
+    "createdAt": "2025-08-11T15:36:40.224Z",
+    "updatedAt": "2025-08-11T15:36:40.224Z"
+  }
+}
